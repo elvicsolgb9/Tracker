@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tracker</title>
+		
+        <script language="javascript" type="text/javascript">
+            var calls = 0;
+            var transfers = 0;
+                        
+            function AddCall() {
+                calls++;
+                var numTrans = document.getElementById("numCalls");
+                numTrans.textContent = calls + " current number(s) of calls.";
+                CalculateTransRate();
+                FillTextArea();
+            }
+            
+            function AddTransfer() {
+                transfers++;
+                var numTrans = document.getElementById("numTrans");
+                numTrans.textContent = transfers + " current number(s) of transfers.";
+                CalculateTransRate();
+                FillTextArea();
+            }
+            
+            function CalculateTransRate() {
+                var transRate = transfers / calls;
+                var lowrate = document.getElementById("lowTransRate");
+                var highrate = document.getElementById("highTransRate");
+                
+                if (transRate < 0.30) {
+                    var transRatePercent = Number(transfers/calls).toLocaleString(undefined, {style:'percent', minimumFractionDigits:2});
+                    lowrate.textContent = transRatePercent;
+                    highrate.textContent = "";
+                }
+                else {
+                    var transRatePercent = Number(transfers/calls).toLocaleString(undefined, {style:'percent', minimumFractionDigits:2});
+                    highrate.textContent = transRatePercent;
+                    lowrate.textContent = "";
+                }
+                    
+                CalCalls2Make(transRate);
+            }
+            
+           
+            function CalCalls2Make(transRate) {
+                if (transRate < 0.30) {
+                    var passingRate = document.getElementById("passing");
+                    passingRate.textContent = "(Transfer rate is within passing parameter)";
+                    
+                    var notpassing = document.getElementById("notpassing");
+                    var numcalls2make = document.getElementById("numcalls2make");
+                    notpassing.textContent = "";
+                    numcalls2make.textContent = "";
+                }
+                else {
+                    var deficitCalls = calls;
+                    var tempTransRate = transRate;
+                    
+                    //Algorithm that computes the number of non-transferred calls to be made
+                    //when transfer rate is not passing
+                    for (var callsToMake = -1; tempTransRate > 0.30; callsToMake++) {
+                        tempTransRate = transfers / deficitCalls;
+                        deficitCalls++;
+                    }
+                    
+                    var numcalls2make = document.getElementById("numcalls2make");
+                    numcalls2make.textContent = "Number of Non-transferred calls to Make: " + callsToMake;
+                    
+                    var notpassing = document.getElementById("notpassing");
+                    passing.textContent = "";
+                    notpassing.textContent = "(Transfer rate is not within passing parameter)";
+                    
+                }
+            }
+            
+            function FillTextArea() {
+                var transRatePercent = Number(transfers/calls).toLocaleString(undefined, {style:'percent', minimumFractionDigits:2});
+                var txtArea = document.getElementById("textToCopy");
+                txtArea.value = transfers + " Transfers Over " + calls + " Calls = " + transRatePercent;
+            }
+            
+            function Copy2Clipboard() {
+                let txt = document.getElementById("textToCopy").value;
+                navigator.clipboard.writeText(txt);
+                
+                alert("Copied");
+            }
+            /*
+            function CopyFromClipboard(textToCopy) {
+                let text = navigator.clipboard.readText();
+                text.then(txt => { document.getElementById("textToCopy").value = txt; });
+                
+            }
+            */
+            
+        </script>
+    
+        <style>
+            h1      {color: blue; font:"Georgia"; font-size:14px;}
+            em      {font:"Georgia"; font-size:18px;}
+            footer {font:"Times New Roman"; font-size:11px;}
+            
+            #passing, 
+            #lowTransRate    { color: green;}
+            
+            #notpassing, 
+            #highTransRate   { color: red;}
+            
+        </style>
+	</head>
+	
+	<body>
+	
+	<h1>Click "Add Call" to increment each call made<br/>
+	and "Add Transfer" if a transfer was done. </h1>
+	
+    <table>
+        <tr>
+            <td><form><input type="button" value="Add Call:    " onclick="AddCall(this)" /><td id="numCalls"></td></form></td>
+        </tr>
+        <tr>
+            <td><form><input type="button" value="Add Transfer:" onclick="AddTransfer(this)" /><td id="numTrans"></td></form></td>
+        </tr>
+    </table>
+         
+    <table>
+        <tr>
+            <td><form><input type="textarea" size="27" id="textToCopy" value="" readonly /></form></td>
+            <td><form><input type="button" value="Copy" onclick="Copy2Clipboard(this)" /></form></td>
+        </tr>
+    </table>
+    
+    <p>
+        Transfer Rate = <em id="lowTransRate">0.000</em> <em id="highTransRate"></em>
+    </p>
+    
+    <p>
+        <em id="passing"></em><br />
+        <em id="notpassing"></em><br />
+        <em id="numcalls2make"></em>
+    </p>
+	
+	</body>
+	
+	<footer>
+        This program was written for internal use of 'Team Mapple' to track the daily call transfer rate. <br /> 
+        It was written with a purpose to manage our calls and implement appropriate action within allowable bounds of conduct.
+        Written by: Solomon G. Bacarizas, Jr. under 'Creative Commons'.
+	</footer>
+</html>
